@@ -1,12 +1,15 @@
 import { get } from "lodash/fp";
-import { DeepValue } from "../src/column-factory";
-import { AccessorColumnDef, BaseColumnDef, SortingDirection } from "./column";
-import { Renderer } from "./renderer";
-import { AccessorFn, RowData } from "./types/types";
-import { DeepKeys } from "./types/utils";
+import { DeepValue } from "../../src/column-factory";
+import { BaseColumnDef, SortingDirection } from "../column";
+import { Renderer } from "../renderer";
+import { AccessorFn, RenderFn, RowData } from "../types/types";
+import { DeepKeys } from "../types/utils";
+import { AccessorColumnDef } from "../column/accessor";
+import { HeaderContext } from "../header";
 
-interface Capabilities<TRender = any> {
+export interface Capabilities<TRender = any> {
   render: TRender;
+  // filter: TFilter;
 }
 
 type ColumnOpts = {
@@ -21,8 +24,9 @@ type SortingOpts = {
 };
 
 type RenderingOpts<TData, TValue, TRender> = {
-  // header?: (props: HeaderContext<TData, TValue>) => TRender;
+  header?: RenderFn<HeaderContext<TData, TValue>, TRender>;
 };
+
 type BaseColumnOpts<
   TData,
   TValue,
@@ -134,16 +138,26 @@ interface ColumnFactory<
   accessor: AccessorColumnConstructor<TData, TCapabilities>;
 }
 
+type Shape<T> = {};
+
+export const shape = <T>(): Shape<T> => {
+  return {};
+};
+
 interface ColumnFactoryOpts<TData extends RowData, TRender> {
   renderer?: Renderer<TData, TRender>;
 }
+
 export const columnFactory = <TData extends RowData>() => {
   return {
     create: <TRender>(
       opts?: ColumnFactoryOpts<TData, TRender>,
     ): ColumnFactory<
       TData,
-      { render: unknown extends TRender ? never : TRender }
+      {
+        render: unknown extends TRender ? never : TRender;
+        // filter: unknown extends TFilter ? FilterItem[] : TFilter;
+      }
     > => {
       return {
         prop: propertyColumnConstructor,

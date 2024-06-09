@@ -3,38 +3,8 @@ import React from "react";
 import { ColumnDef } from "./core/column";
 import { reactRenderer } from "./renderer/react";
 import { RowData } from "./core/types/types";
-import { columnFactory } from "./core/factory";
-
-interface HeaderContext<TData, TValue, TFilter> {
-  id: string;
-
-  getFilter: () => TFilter;
-  setFilter: (filter: TFilter) => void;
-}
-
-interface Header<TData, TRender, TValue = unknown, TFilter = unknown> {
-  render: (props: HeaderContext<TData, TValue, TFilter>) => TRender;
-  context: HeaderContext<TData, TValue, TFilter>;
-}
-
-interface CellContext<TData, TValue> {
-  id: string;
-  value: TValue;
-}
-
-interface Cell<TData, TRender, TValue = unknown> {
-  render: (props: CellContext<TData, TValue>) => TRender;
-  context: CellContext<TData, TValue>;
-}
-
-interface Row<TData, TRender> {
-  cells: Cell<TData, TRender>[];
-}
-
-interface Table<TData, TRender> {
-  headers: Header<TData, TRender>[];
-  rows: Row<TData, TRender>[];
-}
+import { columnFactory, shape } from "./core/factory";
+import { Table } from "./core/table";
 
 type User = {
   id: number;
@@ -44,6 +14,7 @@ type User = {
 
 const t = columnFactory<User>().create({
   renderer: reactRenderer(),
+  filter: shape<{ id: string }>(),
 });
 
 const columns = [
